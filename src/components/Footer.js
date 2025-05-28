@@ -2,7 +2,7 @@ import React from 'react';
 
 function Footer() {
   return (
-    <footer className="bg-gray-800 text-white py-8">
+    <footer className="bg-gray-800 text-white py-8 mt-auto">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
@@ -18,9 +18,9 @@ function Footer() {
           <div>
             <h3 className="text-xl font-bold mb-4">Theo dõi chúng tôi</h3>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white">Facebook</a>
-              <a href="#" className="text-gray-400 hover:text-white">Instagram</a>
-              <a href="#" className="text-gray-400 hover:text-white">Twitter</a>
+              <a href="https://facebook.com/shoponline" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">Facebook</a>
+              <a href="https://instagram.com/shoponline" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">Instagram</a>
+              <a href="https://twitter.com/shoponline" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">Twitter</a>
             </div>
           </div>
         </div>

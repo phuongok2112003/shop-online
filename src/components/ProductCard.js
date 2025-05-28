@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import PropTypes from 'prop-types';
 
 function ProductCard({ product }) {
   const { addToCart } = useCart();
@@ -52,5 +53,15 @@ function ProductCard({ product }) {
     </Link>
   );
 }
+
+ProductCard.propTypes = {
+  product: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    image: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired
+  }).isRequired
+};
 
 export default ProductCard; 

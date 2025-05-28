@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import { Link } from 'react-router-dom';
 function Cart() {
   // Mock cart data - replace with actual cart state management
   const [cartItems, setCartItems] = useState([
@@ -42,9 +42,9 @@ function Cart() {
         {cartItems.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-600 mb-4">Giỏ hàng của bạn đang trống</p>
-            <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            <Link to="/" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
               Tiếp tục mua sắm
-            </button>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -13,9 +13,9 @@ function App() {
   return (
     <CartProvider>
       <Router>
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100 flex flex-col">
           <Header />
-          <main>
+          <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<Products />} />
