@@ -1,16 +1,25 @@
 import React from 'react';
-
+import { Link } from 'react-router-dom';
 function HeroSection() {
   return (
-    <section className="bg-blue-600 text-white py-16">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-4xl font-bold mb-4">Chào mừng đến với ShopOnline</h2>
-        <p className="text-xl mb-8">Khám phá ngay những sản phẩm chất lượng với giá tốt nhất</p>
-        <span className="bg-white text-blue-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100">
+    <div className="bg-blue-600 text-white">
+    <div className="container mx-auto px-4 py-16">
+      <div className="max-w-2xl">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          Chào mừng đến với ShopOnline
+        </h1>
+        <p className="text-xl mb-8">
+          Khám phá bộ sưu tập sản phẩm chất lượng cao với giá cả phải chăng
+        </p>
+        <Link
+          to="/products"
+          className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-300"
+        >
           Mua sắm ngay
-        </span>
+        </Link>
       </div>
-    </section>
+    </div>
+  </div>
   );
 }
 

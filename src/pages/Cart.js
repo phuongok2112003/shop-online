@@ -1,38 +1,23 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+
 function Cart() {
-  // Mock cart data - replace with actual cart state management
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: 'Sản phẩm 1',
-      price: 500000,
-      quantity: 2,
-      image: 'https://via.placeholder.com/100x100'
-    },
-    {
-      id: 2,
-      name: 'Sản phẩm 2',
-      price: 750000,
-      quantity: 1,
-      image: 'https://via.placeholder.com/100x100'
-    }
-  ]);
-
-  const updateQuantity = (id, newQuantity) => {
-    if (newQuantity < 1) return;
-    setCartItems(cartItems.map(item =>
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    ));
-  };
-
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  };
-
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const { cartItems, removeFromCart, updateQuantity, getCartTotal } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const subtotal = getCartTotal();
   const shipping = 30000; // Phí vận chuyển cố định
   const total = subtotal + shipping;
+
+  const handleCheckout = () => {
+    if (user) {
+      navigate("/checkout");
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <div className="pt-16">
@@ -42,7 +27,10 @@ function Cart() {
         {cartItems.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-600 mb-4">Giỏ hàng của bạn đang trống</p>
-            <Link to="/" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            <Link
+              to="/"
+              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            >
               Tiếp tục mua sắm
             </Link>
           </div>
@@ -51,36 +39,49 @@ function Cart() {
             {/* Cart Items */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-md p-6">
-                {cartItems.map(item => (
-                  <div key={item.id} className="flex items-center py-4 border-b last:border-b-0">
-                    <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded" />
+                {cartItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center py-4 border-b last:border-b-0"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-20 h-20 object-cover rounded"
+                    />
                     <div className="flex-1 ml-4">
                       <h3 className="text-lg font-semibold">{item.name}</h3>
-                      <p className="text-gray-600">{item.price.toLocaleString('vi-VN')}đ</p>
+                      <p className="text-gray-600">
+                        {item.price.toLocaleString("vi-VN")}đ
+                      </p>
                     </div>
                     <div className="flex items-center">
                       <button
                         className="px-2 py-1 border rounded"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity - 1)
+                        }
                       >
                         -
                       </button>
                       <span className="mx-4">{item.quantity}</span>
                       <button
                         className="px-2 py-1 border rounded"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity + 1)
+                        }
                       >
                         +
                       </button>
                     </div>
                     <div className="ml-4">
                       <p className="font-semibold">
-                        {(item.price * item.quantity).toLocaleString('vi-VN')}đ
+                        {(item.price * item.quantity).toLocaleString("vi-VN")}đ
                       </p>
                     </div>
                     <button
                       className="ml-4 text-red-600 hover:text-red-800"
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeFromCart(item.id)}
                     >
                       Xóa
                     </button>
@@ -96,20 +97,23 @@ function Cart() {
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between">
                     <span>Tạm tính:</span>
-                    <span>{subtotal.toLocaleString('vi-VN')}đ</span>
+                    <span>{subtotal.toLocaleString("vi-VN")}đ</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Phí vận chuyển:</span>
-                    <span>{shipping.toLocaleString('vi-VN')}đ</span>
+                    <span>{shipping.toLocaleString("vi-VN")}đ</span>
                   </div>
                   <div className="border-t pt-2 mt-2">
                     <div className="flex justify-between font-bold">
                       <span>Tổng cộng:</span>
-                      <span>{total.toLocaleString('vi-VN')}đ</span>
+                      <span>{total.toLocaleString("vi-VN")}đ</span>
                     </div>
                   </div>
                 </div>
-                <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+                <button
+                  onClick={handleCheckout}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
+                >
                   Thanh toán
                 </button>
               </div>
@@ -121,4 +125,4 @@ function Cart() {
   );
 }
 
-export default Cart; 
+export default Cart;

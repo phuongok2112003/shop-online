@@ -1,34 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 function Contact() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log(name, value);
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
+    // Xử lý submit form tại đây
+    console.log("Form submitted:", formData);
     // Reset form
     setFormData({
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
     });
-    alert('Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi sớm nhất có thể!');
+    alert("Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi sớm nhất có thể!");
   };
 
   return (
@@ -37,14 +37,16 @@ function Contact() {
         <h1 className="text-3xl font-bold mb-8">Liên hệ với chúng tôi</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Contact Information */}
+          {/* Thông tin liên hệ */}
           <div>
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-bold mb-4">Thông tin liên hệ</h2>
               <div className="space-y-4">
                 <div>
                   <h3 className="font-semibold text-gray-700">Địa chỉ</h3>
-                  <p className="text-gray-600">123 Đường ABC, Quận XYZ, TP.HCM</p>
+                  <p className="text-gray-600">
+                    123 Đường ABC, Quận XYZ, TP.HCM
+                  </p>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-700">Email</h3>
@@ -63,13 +65,18 @@ function Contact() {
             </div>
           </div>
 
-          {/* Contact Form */}
+          {/* Form liên hệ */}
           <div>
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold mb-4">Gửi tin nhắn cho chúng tôi</h2>
+              <h2 className="text-xl font-bold mb-4">
+                Gửi tin nhắn cho chúng tôi
+              </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Họ và tên
                   </label>
                   <input
@@ -83,7 +90,10 @@ function Contact() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Email
                   </label>
                   <input
@@ -97,7 +107,10 @@ function Contact() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Tiêu đề
                   </label>
                   <input
@@ -111,7 +124,10 @@ function Contact() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Nội dung
                   </label>
                   <textarea
@@ -139,4 +155,4 @@ function Contact() {
   );
 }
 
-export default Contact; 
+export default Contact;

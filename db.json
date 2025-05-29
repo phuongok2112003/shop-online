@@ -1,0 +1,49 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "iPhone 14 Pro Max",
+      "price": 29990000,
+      "description": "iPhone 14 Pro Max với chip A16 Bionic, camera 48MP và màn hình Super Retina XDR 6.7 inch.",
+      "image": "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aXBob25lJTIwMTR8ZW58MHx8MHx8fDA%3D",
+      "category": "Điện thoại",
+      "stock": 50
+    },
+    {
+      "id": 2,
+      "name": "Samsung Galaxy S23 Ultra",
+      "price": 26990000,
+      "description": "Samsung Galaxy S23 Ultra với camera 200MP, chip Snapdragon 8 Gen 2 và pin 5000mAh.",
+      "image": "https://images.unsplash.com/photo-1678775702101-9ed9d6d3c7c3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2Ftc3VuZyUyMHMyM3xlbnwwfHwwfHx8MA%3D%3D",
+      "category": "Điện thoại",
+      "stock": 45
+    },
+    {
+      "id": 3,
+      "name": "MacBook Pro M2",
+      "price": 39990000,
+      "description": "MacBook Pro với chip M2, màn hình Liquid Retina XDR 14 inch và thời lượng pin lên đến 18 giờ.",
+      "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWFjYm9va3xlbnwwfHwwfHx8MA%3D%3D",
+      "category": "Laptop",
+      "stock": 30
+    },
+    {
+      "id": 4,
+      "name": "AirPods Pro 2",
+      "price": 5990000,
+      "description": "AirPods Pro 2 với chống ồn chủ động, chế độ xuyên âm và thời lượng pin lên đến 6 giờ.",
+      "image": "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YWlycG9kc3xlbnwwfHwwfHx8MA%3D%3D",
+      "category": "Phụ kiện",
+      "stock": 100
+    },
+    {
+      "id": 5,
+      "name": "iPad Pro M2",
+      "price": 24990000,
+      "description": "iPad Pro với chip M2, màn hình Liquid Retina XDR 12.9 inch và hỗ trợ Apple Pencil 2.",
+      "image": "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aXBhZHxlbnwwfHwwfHx8MA%3D%3D",
+      "category": "Máy tính bảng",
+      "stock": 40
+    }
+  ]
+} 
