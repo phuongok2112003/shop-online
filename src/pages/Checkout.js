@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -70,41 +70,27 @@ function Checkout() {
         try {
           const districts = await getDistricts(shippingAddress.provinceCode);
           setDistricts(districts);
-          setWards([]); // Reset wards khi tỉnh/thành phố thay đổi
-          // Tự động chọn quận/huyện đầu tiên nếu có chỉ 1 lựa chọn, hoặc reset
-          setShippingAddress((prevState) => ({
-            ...prevState,
-            district: districts.length === 1 ? districts[0].name : "",
-            districtCode: districts.length === 1 ? districts[0].code : "",
-            ward: "",
-            wardCode: "",
-          }));
+          setWards([]); // Reset wards when province changes
+
+          // Only update if we're not selecting a saved address
+          if (!selectedAddressId) {
+            setShippingAddress((prev) => ({
+              ...prev,
+              district: districts.length === 1 ? districts[0].name : "",
+              districtCode: districts.length === 1 ? districts[0].code : "",
+              ward: "",
+              wardCode: "",
+            }));
+          }
         } catch (error) {
           console.error("Error fetching districts:", error);
           setDistricts([]);
           setWards([]);
-          setShippingAddress((prevState) => ({
-            ...prevState,
-            district: "",
-            districtCode: "",
-            ward: "",
-            wardCode: "",
-          }));
         }
       };
       fetchDistricts();
-    } else {
-      setDistricts([]);
-      setWards([]);
-      setShippingAddress((prevState) => ({
-        ...prevState,
-        district: "",
-        districtCode: "",
-        ward: "",
-        wardCode: "",
-      }));
     }
-  }, [shippingAddress.provinceCode]);
+  }, [shippingAddress.provinceCode, selectedAddressId]);
 
   // Fetch danh sách Phường/Xã khi Quận/Huyện thay đổi
   useEffect(() => {
@@ -113,33 +99,55 @@ function Checkout() {
         try {
           const wards = await getWards(shippingAddress.districtCode);
           setWards(wards);
-          // Tự động chọn phường/xã đầu tiên nếu có chỉ 1 lựa chọn, hoặc reset
-          setShippingAddress((prevState) => ({
-            ...prevState,
-            ward: wards.length === 1 ? wards[0].name : "",
-            wardCode: wards.length === 1 ? wards[0].code : "",
-          }));
+
+          // Only update if we're not selecting a saved address
+          if (!selectedAddressId) {
+            setShippingAddress((prev) => ({
+              ...prev,
+              ward: wards.length === 1 ? wards[0].name : "",
+              wardCode: wards.length === 1 ? wards[0].code : "",
+            }));
+          }
         } catch (error) {
           console.error("Error fetching wards:", error);
           setWards([]);
-          setShippingAddress((prevState) => ({
-            ...prevState,
-            ward: "",
-            wardCode: "",
-          }));
         }
       };
       fetchWards();
-    } else {
-      setWards([]);
-      setShippingAddress((prevState) => ({
-        ...prevState,
-        ward: "",
-        wardCode: "",
-      }));
     }
-  }, [shippingAddress.districtCode]);
+  }, [shippingAddress.districtCode, selectedAddressId]);
 
+  const handleAddressSelect = useCallback(
+    (addressId) => {
+      const selectedAddress = addresses.find((addr) => addr.id === addressId);
+      if (selectedAddress) {
+        // First, set the selected address ID
+        setSelectedAddressId(addressId);
+
+        // Then update the shipping address
+        setShippingAddress(selectedAddress);
+
+        // Finally, update the shipping cost
+        setShippingCost(calculateShippingCost(selectedAddress));
+
+        // Fetch districts and wards for the selected address
+        getDistricts(selectedAddress.provinceCode)
+          .then((districts) => {
+            setDistricts(districts);
+            return getWards(selectedAddress.districtCode);
+          })
+          .then((wards) => {
+            setWards(wards);
+          })
+          .catch((error) => {
+            console.error("Error fetching address data:", error);
+          });
+      }
+    },
+    [addresses, calculateShippingCost]
+  );
+
+  // Remove the auto-select effect since it's causing issues
   useEffect(() => {
     // Nếu chưa đăng nhập và AuthContext đã load xong, chuyển hướng đến trang đăng nhập
     if (!authLoading && !user) {
@@ -148,33 +156,9 @@ function Checkout() {
 
     // Nếu giỏ hàng trống, chuyển hướng về trang chủ hoặc trang sản phẩm
     if (cartItems.length === 0) {
-      navigate("/products"); // hoặc navigate('/');
+      navigate("/products");
     }
-
-    // Tự động chọn địa chỉ đầu tiên nếu có khi trang load và user đã đăng nhập
-    // và danh sách provinces đã load xong
-    if (
-      !authLoading &&
-      user &&
-      addresses.length > 0 &&
-      selectedAddressId === null &&
-      provinces.length > 0
-    ) {
-      const firstAddress = addresses[0];
-      setSelectedAddressId(firstAddress.id);
-      setShippingAddress(firstAddress);
-      // Tính phí ship cho địa chỉ mặc định
-      setShippingCost(calculateShippingCost(firstAddress));
-    }
-  }, [
-    user,
-    authLoading,
-    cartItems,
-    navigate,
-    addresses,
-    selectedAddressId,
-    provinces.length,
-  ]);
+  }, [user, authLoading, cartItems, navigate]);
 
   // Effect để tính toán lại phí ship khi shippingAddress thay đổi (trừ lần mount đầu tiên)
   const initialMountShipping = useRef(true);
@@ -188,17 +172,18 @@ function Checkout() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // Xử lý thay đổi cho các input text thông thường (Họ tên, Địa chỉ đường, Mã bưu chính)
-    setShippingAddress({ ...shippingAddress, [name]: value });
-    setSelectedAddressId(null); // Bỏ chọn địa chỉ đã lưu khi người dùng chỉnh sửa form
+    setShippingAddress((prev) => ({ ...prev, [name]: value }));
+    setSelectedAddressId(null); // Clear selected address when manually editing
   };
 
-  // Xử lý thay đổi cho dropdown Tỉnh/Thành phố
   const handleProvinceChange = (e) => {
     const selectedCode = e.target.value;
-    const selectedProvince = provinces.find((p) => p.code === selectedCode);
-    setShippingAddress((prevState) => ({
-      ...prevState,
+    const selectedProvince = provinces.find(
+      (p) => p.code === Number(selectedCode)
+    );
+    setSelectedAddressId(null); // Clear selected address when changing province
+    setShippingAddress((prev) => ({
+      ...prev,
       provinceCode: selectedCode,
       city: selectedProvince ? selectedProvince.name : "",
       district: "",
@@ -206,44 +191,32 @@ function Checkout() {
       ward: "",
       wardCode: "",
     }));
-    setSelectedAddressId(null);
   };
 
-  // Xử lý thay đổi cho dropdown Quận/Huyện
   const handleDistrictChange = (e) => {
     const selectedCode = e.target.value;
-    const selectedDistrict = districts.find((d) => d.code === selectedCode);
-    setShippingAddress((prevState) => ({
-      ...prevState,
+    const selectedDistrict = districts.find(
+      (d) => d.code === Number(selectedCode)
+    );
+    setSelectedAddressId(null); // Clear selected address when changing district
+    setShippingAddress((prev) => ({
+      ...prev,
       districtCode: selectedCode,
       district: selectedDistrict ? selectedDistrict.name : "",
       ward: "",
       wardCode: "",
     }));
-    setSelectedAddressId(null);
   };
 
-  // Xử lý thay đổi cho dropdown Phường/Xã
   const handleWardChange = (e) => {
     const selectedCode = e.target.value;
-    const selectedWard = wards.find((w) => w.code === selectedCode);
-    setShippingAddress((prevState) => ({
-      ...prevState,
+    const selectedWard = wards.find((w) => w.code === Number(selectedCode));
+    setSelectedAddressId(null); // Clear selected address when changing ward
+    setShippingAddress((prev) => ({
+      ...prev,
       wardCode: selectedCode,
       ward: selectedWard ? selectedWard.name : "",
     }));
-    setSelectedAddressId(null);
-  };
-
-  const handleAddressSelect = (addressId) => {
-    setSelectedAddressId(addressId);
-    const selectedAddress = addresses.find((addr) => addr.id === addressId);
-    if (selectedAddress) {
-      // Khi chọn địa chỉ đã lưu, set toàn bộ state địa chỉ và tính phí ship
-      setShippingAddress(selectedAddress);
-      setShippingCost(calculateShippingCost(selectedAddress));
-      // API sẽ tự động fetch districts/wards dựa trên provinceCode được set ở trên
-    }
   };
 
   const handlePlaceOrder = async () => {
@@ -315,7 +288,10 @@ function Checkout() {
                 <h3 className="text-lg font-bold mb-4">Chọn địa chỉ đã lưu</h3>
                 <div className="space-y-4">
                   {addresses.map((address) => (
-                    <div key={address.id} className="flex items-start">
+                    <div
+                      key={address.id}
+                      className="flex items-start hover:bg-gray-50 p-2 rounded"
+                    >
                       <input
                         type="radio"
                         id={`address-${address.id}`}
@@ -323,14 +299,15 @@ function Checkout() {
                         value={address.id}
                         checked={selectedAddressId === address.id}
                         onChange={() => handleAddressSelect(address.id)}
-                        className="mt-1 mr-2"
+                        className="mt-1 mr-2 cursor-pointer"
                       />
                       <label
                         htmlFor={`address-${address.id}`}
-                        className="flex-1 text-gray-700"
+                        className="flex-1 text-gray-700 cursor-pointer"
                       >
                         <span className="font-semibold">{address.name}</span> -{" "}
-                        {address.address}, {address.city}, {address.country}
+                        {address.address}, {address.ward}, {address.district},{" "}
+                        {address.city}, {address.country}
                         {address.postalCode && (
                           <span> - {address.postalCode}</span>
                         )}

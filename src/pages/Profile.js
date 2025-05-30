@@ -177,99 +177,76 @@ function Profile() {
     }
   }, [editingAddressData.districtCode]);
 
-  const handleNewInputChange = (e) => {
+  const handleInputChange = (e, isEditing = false) => {
     const { name, value } = e.target;
-    setNewAddress({ ...newAddress, [name]: value });
+    if (isEditing) {
+      setEditingAddressData((prev) => ({ ...prev, [name]: value }));
+    } else {
+      setNewAddress((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleNewProvinceChange = (e) => {
+  const handleProvinceChange = (e, isEditing = false) => {
     const selectedCode = e.target.value;
     const selectedProvince = provinces.find(
       (p) => p.code === Number(selectedCode)
     );
-    console.log(provinces);
-    console.log(typeof selectedCode);
-    console.log(typeof provinces[0].code);
-    setNewAddress((prevState) => ({
-      ...prevState,
+
+    const updateState = (prev) => ({
+      ...prev,
       provinceCode: selectedCode,
       city: selectedProvince ? selectedProvince.name : "",
       districtCode: "",
       district: "",
       wardCode: "",
       ward: "",
-    }));
+    });
+
+    if (isEditing) {
+      setEditingAddressData(updateState);
+    } else {
+      setNewAddress(updateState);
+    }
   };
 
-  const handleNewDistrictChange = (e) => {
+  const handleDistrictChange = (e, isEditing = false) => {
     const selectedCode = e.target.value;
-    const selectedDistrict = newDistricts.find(
+    const districts = isEditing ? editingDistricts : newDistricts;
+    const selectedDistrict = districts.find(
       (d) => d.code === Number(selectedCode)
     );
-    setNewAddress((prevState) => ({
-      ...prevState,
+
+    const updateState = (prev) => ({
+      ...prev,
       districtCode: selectedCode,
       district: selectedDistrict ? selectedDistrict.name : "",
       wardCode: "",
       ward: "",
-    }));
+    });
+
+    if (isEditing) {
+      setEditingAddressData(updateState);
+    } else {
+      setNewAddress(updateState);
+    }
   };
 
-  const handleNewWardChange = (e) => {
+  const handleWardChange = (e, isEditing = false) => {
     const selectedCode = e.target.value;
-    const selectedWard = newWards.find((w) => w.code === Number(selectedCode));
-    setNewAddress((prevState) => ({
-      ...prevState,
+    const wards = isEditing ? editingWards : newWards;
+    const selectedWard = wards.find((w) => w.code === Number(selectedCode));
+
+    const updateState = (prev) => ({
+      ...prev,
       wardCode: selectedCode,
       ward: selectedWard ? selectedWard.name : "",
-    }));
-  };
+    });
 
-  const handleEditingInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditingAddressData({ ...editingAddressData, [name]: value });
-  };
-
-  const handleEditingProvinceChange = (e) => {
-    const selectedCode = e.target.value;
-    const selectedProvince = provinces.find(
-      (p) => p.code === Number(selectedCode)
-    );
-    setEditingAddressData((prevState) => ({
-      ...prevState,
-      provinceCode: selectedCode,
-      city: selectedProvince ? selectedProvince.name : "",
-      districtCode: "",
-      district: "",
-      wardCode: "",
-      ward: "",
-    }));
-  };
-
-  const handleEditingDistrictChange = (e) => {
-    const selectedCode = e.target.value;
-    const selectedDistrict = editingDistricts.find(
-      (d) => d.code === Number(selectedCode)
-    );
-    setEditingAddressData((prevState) => ({
-      ...prevState,
-      districtCode: selectedCode,
-      district: selectedDistrict ? selectedDistrict.name : "",
-      wardCode: "",
-      ward: "",
-    }));
-  };
-
-  const handleEditingWardChange = (e) => {
-    const selectedCode = e.target.value;
-    const selectedWard = editingWards.find(
-      (w) => w.code === Number(selectedCode)
-    );
-    setEditingAddressData((prevState) => ({
-      ...prevState,
-      wardCode: selectedCode,
-      ward: selectedWard ? selectedWard.name : "",
-    }));
+    if (isEditing) {
+      setEditingAddressData(updateState);
+    } else {
+      setNewAddress(updateState);
+    }
   };
 
   const handleAddAddress = (e) => {
@@ -467,10 +444,10 @@ function Profile() {
               {!(apiLoading && editingAddressData.provinceCode) && (
                 <AddressForm
                   formData={editingAddressData}
-                  handleChange={handleEditingInputChange}
-                  handleProvinceChange={handleEditingProvinceChange}
-                  handleDistrictChange={handleEditingDistrictChange}
-                  handleWardChange={handleEditingWardChange}
+                  handleChange={handleInputChange}
+                  handleProvinceChange={handleProvinceChange}
+                  handleDistrictChange={handleDistrictChange}
+                  handleWardChange={handleWardChange}
                   provinces={provinces}
                   districts={editingDistricts}
                   wards={editingWards}
@@ -494,10 +471,10 @@ function Profile() {
               {!(apiLoading && newAddress.provinceCode) && (
                 <AddressForm
                   formData={newAddress}
-                  handleChange={handleNewInputChange}
-                  handleProvinceChange={handleNewProvinceChange}
-                  handleDistrictChange={handleNewDistrictChange}
-                  handleWardChange={handleNewWardChange}
+                  handleChange={handleInputChange}
+                  handleProvinceChange={handleProvinceChange}
+                  handleDistrictChange={handleDistrictChange}
+                  handleWardChange={handleWardChange}
                   provinces={provinces}
                   districts={newDistricts}
                   wards={newWards}
