@@ -8,7 +8,7 @@ import { createOrder } from "../services/orderApi";
 // Hàm mô phỏng tính phí ship dựa trên địa chỉ (giờ có thể dùng cả ID tỉnh/thành phố)
 const calculateShippingCost = (address) => {
   // Logic mô phỏng: Ví dụ, phí ship thấp hơn cho Hà Nội (ID 01) hoặc TP. Hồ Chí Minh (ID 79)
-  const lowerShippingProvinceCodes = ["01", "79"]; // Mã của Hà Nội và TP. Hồ Chí Minh từ API
+  const lowerShippingProvinceCodes = ["1", "79"]; // Mã của Hà Nội và TP. Hồ Chí Minh từ API
 
   if (
     address.provinceCode &&
@@ -72,8 +72,8 @@ function Checkout() {
           setDistricts(districts);
           setWards([]); // Reset wards when province changes
 
-          // Only update if we're not selecting a saved address
-          if (!selectedAddressId) {
+          // Only update if we're not selecting a saved address and district is empty
+          if (!selectedAddressId && !shippingAddress.districtCode) {
             setShippingAddress((prev) => ({
               ...prev,
               district: districts.length === 1 ? districts[0].name : "",
@@ -100,8 +100,8 @@ function Checkout() {
           const wards = await getWards(shippingAddress.districtCode);
           setWards(wards);
 
-          // Only update if we're not selecting a saved address
-          if (!selectedAddressId) {
+          // Only update if we're not selecting a saved address and ward is empty
+          if (!selectedAddressId && !shippingAddress.wardCode) {
             setShippingAddress((prev) => ({
               ...prev,
               ward: wards.length === 1 ? wards[0].name : "",
@@ -126,25 +126,9 @@ function Checkout() {
 
         // Then update the shipping address
         setShippingAddress(selectedAddress);
-
-        // Finally, update the shipping cost
-        setShippingCost(calculateShippingCost(selectedAddress));
-
-        // Fetch districts and wards for the selected address
-        getDistricts(selectedAddress.provinceCode)
-          .then((districts) => {
-            setDistricts(districts);
-            return getWards(selectedAddress.districtCode);
-          })
-          .then((wards) => {
-            setWards(wards);
-          })
-          .catch((error) => {
-            console.error("Error fetching address data:", error);
-          });
       }
     },
-    [addresses, calculateShippingCost]
+    [addresses]
   );
 
   // Remove the auto-select effect since it's causing issues
@@ -160,19 +144,19 @@ function Checkout() {
     }
   }, [user, authLoading, cartItems, navigate]);
 
-  // Effect để tính toán lại phí ship khi shippingAddress thay đổi (trừ lần mount đầu tiên)
-  const initialMountShipping = useRef(true);
+  // Effect để tính toán lại phí ship khi shippingAddress thay đổi
   useEffect(() => {
-    if (initialMountShipping.current) {
-      initialMountShipping.current = false;
-      return;
-    }
     setShippingCost(calculateShippingCost(shippingAddress));
   }, [shippingAddress]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setShippingAddress((prev) => ({ ...prev, [name]: value }));
+    console.log("Current shipping address:", shippingAddress);
+    setShippingAddress((prev) => {
+      const updated = { ...prev, [name]: value };
+      console.log("Updated shipping address:", updated);
+      return updated;
+    });
     setSelectedAddressId(null); // Clear selected address when manually editing
   };
 

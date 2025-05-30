@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getProvinces, getDistricts, getWards } from "../services/addressApi";
 import AddressForm from "~/components/AddressForm";
@@ -47,7 +47,7 @@ function Profile() {
   const [editingDistricts, setEditingDistricts] = useState([]); // Quận/Huyện cho form sửa
   const [editingWards, setEditingWards] = useState([]); // Phường/Xã cho form sửa
   const [apiLoading, setApiLoading] = useState(true); // Loading chung cho API
-
+  const [messeloi, setMesseloi] = useState("");
   // Lấy danh sách tỉnh/thành phố khi component được mount
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -179,6 +179,7 @@ function Profile() {
 
   const handleInputChange = (e, isEditing = false) => {
     const { name, value } = e.target;
+    setMesseloi("")
     if (isEditing) {
       setEditingAddressData((prev) => ({ ...prev, [name]: value }));
     } else {
@@ -253,8 +254,8 @@ function Profile() {
     e.preventDefault();
     // Validate required fields
     if (
-      !newAddress.name ||
-      !newAddress.address ||
+      !newAddress.name.trim() ||
+      !newAddress.address.trim() ||
       !newAddress.provinceCode ||
       !newAddress.districtCode ||
       !newAddress.wardCode
@@ -335,7 +336,10 @@ function Profile() {
       country: "Việt Nam",
     });
   };
-
+  const handleOnBulur = (e) => {
+   if(!e.target.value.trim())
+    setMesseloi("Moi ban nhap vao");
+  };
   const handleRemoveAddress = (addressId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này?")) {
       removeAddress(addressId);
@@ -476,6 +480,8 @@ function Profile() {
                   handleDistrictChange={handleDistrictChange}
                   handleWardChange={handleWardChange}
                   provinces={provinces}
+                  handleOnBulur={handleOnBulur}
+                  messeloi={messeloi}
                   districts={newDistricts}
                   wards={newWards}
                   apiLoading={apiLoading}

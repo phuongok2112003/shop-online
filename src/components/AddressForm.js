@@ -10,8 +10,10 @@ function AddressForm({
   districts,
   wards,
   apiLoading,
+  handleOnBulur,
   onSubmit,
   onCancel,
+  messeloi,
   isEditing = false,
 }) {
   return (
@@ -27,11 +29,15 @@ function AddressForm({
           type="text"
           id={`${isEditing ? "edit" : "new"}-name`}
           name="name"
+          onBlur={handleOnBulur}
           value={formData.name}
           onChange={handleChange}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
           required
         />
+        <span  style={{ color: "red", fontSize: "15px", fontStyle: "italic" }}>
+          {messeloi}
+        </span>
       </div>
       <div>
         <label
