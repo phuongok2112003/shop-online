@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { OrderProvider } from "./context/OrderContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -50,51 +51,53 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
-          <div className="min-h-screen bg-gray-100 flex flex-col">
-            <Header />
-            <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/products/:id" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+        <OrderProvider>
+          <Router>
+            <div className="min-h-screen bg-gray-100 flex flex-col">
+              <Header />
+              <main className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/products/:id" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
 
-                {/* Route được bảo vệ cho trang Checkout */}
-                <Route
-                  path="/checkout"
-                  element={
-                    <ProtectedRoute>
-                      <Checkout />
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Route được bảo vệ cho trang Checkout */}
+                  <Route
+                    path="/checkout"
+                    element={
+                      <ProtectedRoute>
+                        <Checkout />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* Thêm các route được bảo vệ khác tại đây nếu cần */}
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/orders"
-                  element={
-                    <ProtectedRoute>
-                      <Orders />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </Router>
+                  {/* Thêm các route được bảo vệ khác tại đây nếu cần */}
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/orders"
+                    element={
+                      <ProtectedRoute>
+                        <Orders />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </Router>
+        </OrderProvider>
       </CartProvider>
     </AuthProvider>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProductById, getProducts } from "../services/api";
 import { useCart } from "../context/CartContext";
@@ -14,34 +14,58 @@ function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState([]);
 
+  // Hàm xử lý cuộn sản phẩm liên quan
+  const scrollRelatedProducts = useCallback((direction) => {
+    const container = document.getElementById("related-products-container");
+    const scrollAmount = 300; // Số pixel cuộn mỗi lần
+    if (container) {
+      container.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  }, []);
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const data = await getProductById(id);
+        console.log("data ", data.category);
         setProduct(data);
         setLoading(false);
+        return data; // Return the product data
       } catch (err) {
         setError("Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.");
         setLoading(false);
+        return null;
       }
     };
 
-    const fetchRelatedProducts = async () => {
+    const fetchRelatedProducts = async (productData) => {
+      if (!productData) return;
+
       try {
         const products = await getProducts();
-        // Lấy 3 sản phẩm ngẫu nhiên khác làm sản phẩm liên quan
-        const filteredProducts = products.filter((p) => p.id !== parseInt(id));
-        const randomProducts = filteredProducts
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 3);
-        setRelatedProducts(randomProducts);
+        // Lấy sản phẩm cùng danh mục
+        const filteredProducts = products.filter(
+          (p) => p.id !== parseInt(id) && p.category === productData.category
+        );
+        // Giới hạn 3 sản phẩm
+        const relatedProducts = filteredProducts.slice(0, 3);
+        setRelatedProducts(relatedProducts);
       } catch (err) {
         console.error("Error fetching related products:", err);
       }
     };
 
-    fetchProduct();
-    fetchRelatedProducts();
+    const initializeData = async () => {
+      const productData = await fetchProduct();
+      if (productData) {
+        await fetchRelatedProducts(productData);
+      }
+    };
+
+    initializeData();
   }, [id]);
 
   const handleQuantityChange = (value) => {
@@ -177,13 +201,63 @@ function ProductDetail() {
         </div>
 
         {/* Sản phẩm liên quan */}
-        <div>
+        <div className="relative">
           <h2 className="text-2xl font-bold mb-6">Sản phẩm liên quan</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          {/* Nút điều hướng trái */}
+          <button
+            onClick={() => scrollRelatedProducts("left")}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+
+          {/* Container cuộn ngang */}
+          <div
+            id="related-products-container"
+            className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
             {relatedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <div key={product.id} className="flex-none w-72">
+                <ProductCard product={product} />
+              </div>
             ))}
           </div>
+
+          {/* Nút điều hướng phải */}
+          <button
+            onClick={() => scrollRelatedProducts("right")}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

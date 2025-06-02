@@ -11,13 +11,13 @@ function ProductCard({ product }) {
   };
 
   return (
-    <Link to={`/products/${product.id}`} className="block">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-        <div className="relative">
+    <Link to={`/products/${product.id}`} className="block h-full">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
+        <div className="relative h-64">
           <img
             src={product.image}
             alt={product.title}
-            className="w-full h-48 object-contain p-4"
+            className="w-full h-full object-contain p-4"
           />
           <div className="absolute top-2 right-2">
             <button
@@ -42,11 +42,14 @@ function ProductCard({ product }) {
             </button>
           </div>
         </div>
-        <div className="p-4">
-          <h3 className="text-xl font-semibold mb-2 hover:text-blue-600 transition-colors duration-300">
+        <div className="p-4 flex-grow flex flex-col">
+          <h3 className="text-xl font-semibold mb-2 hover:text-blue-600 transition-colors duration-300 line-clamp-1">
             {product.title}
           </h3>
-          <p className="text-gray-600 mb-4 line-clamp-2">
+          <p
+            className="text-gray-600 mb-4 line-clamp-2 flex-grow"
+            title={product.description}
+          >
             {product.description}
           </p>
           <div className="flex justify-between items-center">

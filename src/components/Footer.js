@@ -13,7 +13,7 @@ function Footer() {
             <h3 className="text-xl font-bold mb-4">Liên hệ</h3>
             <p className="text-gray-400">Email: contact@shoponline.com</p>
             <p className="text-gray-400">Điện thoại: 0123 456 789</p>
-            <p className="text-gray-400">Địa chỉ: 123 Đường ABC, Quận XYZ, TP.HCM</p>
+            <p className="text-gray-400">Địa chỉ: 61/296 Lĩnh Nam, Hoàng Mai, Hà NộiNội </p>
           </div>
           <div>
             <h3 className="text-xl font-bold mb-4">Theo dõi chúng tôi</h3>

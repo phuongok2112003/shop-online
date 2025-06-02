@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { useOrders } from "../context/OrderContext";
 import { getProvinces, getDistricts, getWards } from "../services/addressApi";
 import { createOrder } from "../services/orderApi";
+import BankTransferInfo from "../components/BankTransferInfo";
 
 // Hàm mô phỏng tính phí ship dựa trên địa chỉ (giờ có thể dùng cả ID tỉnh/thành phố)
 const calculateShippingCost = (address) => {
@@ -24,18 +26,19 @@ function Checkout() {
   const navigate = useNavigate();
   const { user, loading: authLoading, addresses } = useAuth();
   const { cartItems, getCartTotal, clearCart } = useCart();
+  const { addOrder } = useOrders();
 
   const [shippingAddress, setShippingAddress] = useState({
     name: "",
-    address: "", // Tạm giữ field này cho địa chỉ đường cụ thể nếu cần, hoặc sử dụng cho tên Quận/Huyện sau
-    city: "", // Tên Tỉnh/Thành phố
-    provinceCode: "", // Mã Tỉnh/Thành phố
-    district: "", // Tên Quận/Huyện
-    districtCode: "", // Mã Quận/Huyện
-    ward: "", // Tên Phường/Xã
-    wardCode: "", // Mã Phường/Xã
+    address: "",
+    city: "",
+    provinceCode: "",
+    district: "",
+    districtCode: "",
+    ward: "",
+    wardCode: "",
     postalCode: "",
-    country: "Việt Nam", // Mặc định là Việt Nam
+    country: "Việt Nam",
   });
 
   const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -44,9 +47,10 @@ function Checkout() {
   const [districts, setDistricts] = useState([]); // Danh sách Quận/Huyện từ API
   const [wards, setWards] = useState([]); // Danh sách Phường/Xã từ API
   const [apiLoading, setApiLoading] = useState(true); // State loading cho API
+  const [paymentMethod, setPaymentMethod] = useState("cash"); // Thêm state cho phương thức thanh toán
 
   const subtotal = getCartTotal();
-  const total = subtotal + shippingCost;
+  let total = Math.round(subtotal + shippingCost);
 
   // Fetch danh sách Tỉnh/Thành phố khi component mount
   useEffect(() => {
@@ -64,6 +68,7 @@ function Checkout() {
   }, []);
 
   // Fetch danh sách Quận/Huyện khi Tỉnh/Thành phố thay đổi
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (shippingAddress.provinceCode) {
       const fetchDistricts = async () => {
@@ -93,6 +98,7 @@ function Checkout() {
   }, [shippingAddress.provinceCode, selectedAddressId]);
 
   // Fetch danh sách Phường/Xã khi Quận/Huyện thay đổi
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (shippingAddress.districtCode) {
       const fetchWards = async () => {
@@ -137,12 +143,7 @@ function Checkout() {
     if (!authLoading && !user) {
       navigate("/login");
     }
-
-    // Nếu giỏ hàng trống, chuyển hướng về trang chủ hoặc trang sản phẩm
-    if (cartItems.length === 0) {
-      navigate("/products");
-    }
-  }, [user, authLoading, cartItems, navigate]);
+  }, [user, authLoading, navigate]);
 
   // Effect để tính toán lại phí ship khi shippingAddress thay đổi
   useEffect(() => {
@@ -151,13 +152,11 @@ function Checkout() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log("Current shipping address:", shippingAddress);
-    setShippingAddress((prev) => {
-      const updated = { ...prev, [name]: value };
-      console.log("Updated shipping address:", updated);
-      return updated;
-    });
-    setSelectedAddressId(null); // Clear selected address when manually editing
+    setShippingAddress((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setSelectedAddressId(null);
   };
 
   const handleProvinceChange = (e) => {
@@ -174,6 +173,7 @@ function Checkout() {
       districtCode: "",
       ward: "",
       wardCode: "",
+      address: "",
     }));
   };
 
@@ -189,6 +189,7 @@ function Checkout() {
       district: selectedDistrict ? selectedDistrict.name : "",
       ward: "",
       wardCode: "",
+      address: "",
     }));
   };
 
@@ -200,11 +201,11 @@ function Checkout() {
       ...prev,
       wardCode: selectedCode,
       ward: selectedWard ? selectedWard.name : "",
+      address: "",
     }));
   };
 
   const handlePlaceOrder = async () => {
-    // Logic xử lý đặt hàng
     if (
       !shippingAddress.name ||
       !shippingAddress.address ||
@@ -223,14 +224,20 @@ function Checkout() {
         subtotal,
         shippingCost,
         total,
+        paymentMethod,
       };
 
       const result = await createOrder(orderData);
 
       if (result.success) {
-        clearCart();
+        // Thêm đơn hàng vào OrderContext
+        (paymentMethod === "bank")?addOrder({...orderData,status:"finished"}): addOrder(orderData);
         alert(result.message);
+        console.log("Đơn hàng đã được thêm vào OrderContext");
+        // Chuyển hướng trước khi xóa giỏ hàng
+        clearCart();
         navigate("/orders");
+        // Xóa giỏ hàng sau khi đã chuyển hướng
       } else {
         alert("Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại sau.");
       }
@@ -493,6 +500,56 @@ function Checkout() {
                   <span className="text-blue-600">
                     {total.toLocaleString("vi-VN")}đ
                   </span>
+                )}
+              </div>
+
+              {/* Thêm phần chọn phương thức thanh toán */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">
+                  Phương thức thanh toán
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="cash"
+                      name="paymentMethod"
+                      value="cash"
+                      checked={paymentMethod === "cash"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="mr-2"
+                    />
+                    <label
+                      htmlFor="cash"
+                      className="flex items-center cursor-pointer"
+                    >
+                      <span className="mr-2">💵</span>
+                      Thanh toán khi nhận hàng (COD)
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="bank"
+                      name="paymentMethod"
+                      value="bank"
+                      checked={paymentMethod === "bank"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="mr-2"
+                    />
+                    <label
+                      htmlFor="bank"
+                      className="flex items-center cursor-pointer"
+                    >
+                      <span className="mr-2">🏦</span>
+                      Chuyển khoản ngân hàng
+                    </label>
+                  </div>
+                </div>
+
+                {/* Hiển thị thông tin chuyển khoản khi chọn phương thức chuyển khoản ngân hàng */}
+                {paymentMethod === "bank" && (
+                  <BankTransferInfo totalPay={total} />
                 )}
               </div>
 
