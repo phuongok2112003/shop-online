@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useCart } from "../context/CartContext";
-import { useOrders } from "../context/OrderContext";
-import { getProvinces, getDistricts, getWards } from "../services/addressApi";
-import { createOrder } from "../services/orderApi";
-import BankTransferInfo from "../components/BankTransferInfo";
+import { useAuth } from "~/context/AuthContext";
+import { useCart } from "~/context/CartContext";
+import { useOrders } from "~/context/OrderContext";
+import { getProvinces, getDistricts, getWards } from "~/services/addressApi";
+import { createOrder } from "~/services/orderApi";
+import BankTransferInfo from "~/components/BankTransferInfo";
 
 // Hàm mô phỏng tính phí ship dựa trên địa chỉ (giờ có thể dùng cả ID tỉnh/thành phố)
 const calculateShippingCost = (address) => {
@@ -231,7 +231,9 @@ function Checkout() {
 
       if (result.success) {
         // Thêm đơn hàng vào OrderContext
-        (paymentMethod === "bank")?addOrder({...orderData,status:"finished"}): addOrder(orderData);
+        paymentMethod === "bank"
+          ? addOrder({ ...orderData, status: "finished" })
+          : addOrder(orderData);
         alert(result.message);
         console.log("Đơn hàng đã được thêm vào OrderContext");
         // Chuyển hướng trước khi xóa giỏ hàng

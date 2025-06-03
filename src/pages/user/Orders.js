@@ -1,5 +1,5 @@
 import React from "react";
-import { useOrders } from "../context/OrderContext";
+import { useOrders } from "~/context/OrderContext";
 
 function Orders() {
   const { orders } = useOrders();

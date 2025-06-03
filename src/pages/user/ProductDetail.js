@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getProductById, getProducts } from "../services/api";
-import { useCart } from "../context/CartContext";
-import ProductCard from "../components/ProductCard";
+import { getProductById, getProducts } from "~/services/api";
+import { useCart } from "~/context/CartContext";
+import ProductCard from "~/components/ProductCard";
 
 function ProductDetail() {
   const { id } = useParams();
@@ -50,8 +50,8 @@ function ProductDetail() {
         const filteredProducts = products.filter(
           (p) => p.id !== parseInt(id) && p.category === productData.category
         );
-        // Giới hạn 3 sản phẩm
-        const relatedProducts = filteredProducts.slice(0, 3);
+
+        const relatedProducts = filteredProducts.slice(0, 10);
         setRelatedProducts(relatedProducts);
       } catch (err) {
         console.error("Error fetching related products:", err);
@@ -208,6 +208,7 @@ function ProductDetail() {
           <button
             onClick={() => scrollRelatedProducts("left")}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg"
+            style={{ marginLeft: "-1rem" }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -228,11 +229,20 @@ function ProductDetail() {
           {/* Container cuộn ngang */}
           <div
             id="related-products-container"
-            className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            className="flex overflow-x-auto gap-6 pb-4 px-4 scrollbar-hide"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+              scrollBehavior: "smooth",
+              WebkitOverflowScrolling: "touch",
+            }}
           >
             {relatedProducts.map((product) => (
-              <div key={product.id} className="flex-none w-72">
+              <div
+                key={product.id}
+                className="flex-none"
+                style={{ width: "300px" }}
+              >
                 <ProductCard product={product} />
               </div>
             ))}
@@ -242,6 +252,7 @@ function ProductDetail() {
           <button
             onClick={() => scrollRelatedProducts("right")}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg"
+            style={{ marginRight: "-1rem" }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

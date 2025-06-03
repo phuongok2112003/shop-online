@@ -1,7 +1,8 @@
 import React from "react";
-import FeaturedProducts from "../components/FeaturedProducts";
-import HeroSection from "../components/HeroSection";
-import FeaturesSection from "../components/FeaturesSection";
+import FeaturedProducts from "~/components/FeaturedProducts";
+import HeroSection from "~/components/HeroSection";
+import FeaturesSection from "~/components/FeaturesSection";
+
 function Home() {
   return (
     <div className="pt-16">

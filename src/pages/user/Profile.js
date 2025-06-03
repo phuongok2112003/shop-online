@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import { getProvinces, getDistricts, getWards } from "../services/addressApi";
+import { useAuth } from "~/context/AuthContext";
+import { getProvinces, getDistricts, getWards } from "~/services/addressApi";
 import AddressForm from "~/components/AddressForm";
 
 function Profile() {
@@ -179,7 +179,7 @@ function Profile() {
 
   const handleInputChange = (e, isEditing = false) => {
     const { name, value } = e.target;
-    setMesseloi("")
+    setMesseloi("");
     if (isEditing) {
       setEditingAddressData((prev) => ({ ...prev, [name]: value }));
     } else {
@@ -337,8 +337,7 @@ function Profile() {
     });
   };
   const handleOnBulur = (e) => {
-   if(!e.target.value.trim())
-    setMesseloi("Moi ban nhap vao");
+    if (!e.target.value.trim()) setMesseloi("Moi ban nhap vao");
   };
   const handleRemoveAddress = (addressId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa địa chỉ này?")) {

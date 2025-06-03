@@ -1,30 +1,41 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { login } from "../services/authApi";
-import AnimatedBackground from "../components/AnimatedBackground";
+import { register } from "../../services/authApi";
+import AnimatedBackground from "../../components/AnimatedBackground";
 
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+function Register() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+  });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login: authLogin } = useAuth();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true);
 
+    if (formData.password !== formData.confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp");
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      const userData = await login(email, password);
-      authLogin(userData);
-      if (userData.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
+      await register(formData);
+      navigate("/login");
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra. Vui lòng thử lại sau.");
     } finally {
@@ -40,9 +51,11 @@ function Login() {
         <div className="max-w-md mx-auto bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 transform transition-all duration-300 hover:shadow-2xl">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Chào mừng trở lại!
+              Tạo tài khoản mới
             </h1>
-            <p className="text-gray-600">Đăng nhập để tiếp tục</p>
+            <p className="text-gray-600">
+              Tham gia cùng chúng tôi ngay hôm nay
+            </p>
           </div>
 
           {error && (
@@ -68,6 +81,42 @@ function Login() {
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
+                htmlFor="name"
+              >
+                Họ và tên
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  placeholder="Nhập họ và tên của bạn"
+                  required
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="email"
               >
                 Email
@@ -76,8 +125,9 @@ function Login() {
                 <input
                   type="email"
                   id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                   placeholder="Nhập email của bạn"
                   required
@@ -103,6 +153,42 @@ function Login() {
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
+                htmlFor="phone"
+              >
+                Số điện thoại
+              </label>
+              <div className="relative">
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  placeholder="Nhập số điện thoại của bạn"
+                  required
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="password"
               >
                 Mật khẩu
@@ -111,10 +197,47 @@ function Login() {
                 <input
                   type="password"
                   id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                   placeholder="Nhập mật khẩu của bạn"
+                  required
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium text-gray-700 mb-2"
+                htmlFor="confirmPassword"
+              >
+                Xác nhận mật khẩu
+              </label>
+              <div className="relative">
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  placeholder="Nhập lại mật khẩu của bạn"
                   required
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -167,31 +290,21 @@ function Login() {
                   Đang xử lý...
                 </div>
               ) : (
-                "Đăng nhập"
+                "Đăng ký"
               )}
             </button>
           </form>
 
           <div className="mt-8 text-center">
             <p className="text-gray-600">
-              Chưa có tài khoản?{" "}
+              Đã có tài khoản?{" "}
               <Link
-                to="/register"
+                to="/login"
                 className="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
               >
-                Đăng ký ngay
+                Đăng nhập ngay
               </Link>
             </p>
-          </div>
-
-          <div className="mt-6 p-4 bg-white/50 backdrop-blur-sm rounded-lg">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">
-              Tài khoản demo:
-            </h3>
-            <div className="space-y-1 text-sm text-gray-600">
-              <p>User: demo@example.com / password</p>
-              <p>Admin: admin@gmail.com / password</p>
-            </div>
           </div>
         </div>
       </div>
@@ -199,4 +312,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;

@@ -11,7 +11,17 @@ export const login = async (email, password) => {
         email: email,
         name: "Demo User",
       };
-    } else {
+    
+    }  
+    else if(email==="admin@gmail.com"&&password==="password"){
+      return{
+        id: 2,
+        email: email,
+        name: "Demo Admin",
+        role:"admin",
+      }
+    } 
+    else {
       throw new Error("Email hoặc mật khẩu không đúng");
     }
   } catch (error) {
