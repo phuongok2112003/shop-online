@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 
 function Header() {
-  const { cartItems, getCartItemsCount, removeFromCart } = useCart();
+  const { getCartItemsCount } = useCart();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);

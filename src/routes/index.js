@@ -1,6 +1,14 @@
-import userRoutes from "./userRoutes";
-import adminRoutes from "./adminRoutes";
+import UserRoutes from "./userRoutes";
+import AdminRoutes from "./adminRoutes";
 
-const routes = [...userRoutes, ...adminRoutes];
+function AppRoutes() {
+  return (
+    <>
+      <UserRoutes />
+      {console.log("asdhfd")}
+      <AdminRoutes />
+    </>
+  );
+}
 
-export default routes;
+export default AppRoutes;

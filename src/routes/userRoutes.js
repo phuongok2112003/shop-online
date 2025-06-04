@@ -1,3 +1,6 @@
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import Home from "../pages/user/Home";
 import Products from "../pages/user/Products";
 import ProductDetail from "../pages/user/ProductDetail";
@@ -9,84 +12,91 @@ import Checkout from "../pages/user/Checkout";
 import Profile from "../pages/user/Profile";
 import Orders from "../pages/user/Orders";
 import Layout from "~/components/layouts/UserLayout";
+import ProtectedRoute from "~/components/ProtectedRoute";
 
-const userRoutes = [
-  {
-    path: "/",
-    element: (
-      <Layout>
-        <Home />
-      </Layout>
-    ),
-  },
-  {
-    path: "/products",
-    element: (
-      <Layout>
-        <Products />
-      </Layout>
-    ),
-  },
-  {
-    path: "/products/:id",
-    element: (
-      <Layout>
-        <ProductDetail />
-      </Layout>
-    ),
-  },
-  {
-    path: "/cart",
-    element: (
-      <Layout>
-        <Cart />
-      </Layout>
-    ),
-  },
-  {
-    path: "/contact",
-    element: (
-      <Layout>
-        <Contact />
-      </Layout>
-    ),
-    protected: true,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
-  {
-    path: "/checkout",
-    element: (
-      <Layout>
-        <Checkout />
-      </Layout>
-    ),
-    protected: true,
-  },
-  {
-    path: "/profile",
-    element: (
-      <Layout>
-        <Profile />
-      </Layout>
-    ),
-    protected: true,
-  },
-  {
-    path: "/orders",
-    element: (
-      <Layout>
-        <Orders />
-      </Layout>
-    ),
-    protected: true,
-  },
-];
+const UserRoutes = () => {
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Home />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/products"
+        element={
+          <Layout>
+            <Products />
+          </Layout>
+        }
+      />
+      <Route
+        path="/products/:id"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ProductDetail />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <Layout>
+            <Cart />
+          </Layout>
+        }
+      />
+      <Route
+        path="/contact"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Contact />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route
+        path="/checkout"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Checkout />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Profile />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Orders />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+};
 
-export default userRoutes;
+export default UserRoutes;

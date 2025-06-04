@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import productService from "../../services/productService";
-
+import { getProducts } from "../../services/productApi";
+import {useAuth} from "~/context/AuthContext"
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalCategories: 0,
     averagePrice: 0,
   });
-
+  const {user}=useAuth();
   useEffect(() => {
     fetchStats();
   }, []);
 
   const fetchStats = async () => {
     try {
-      const products = await productService.getAll();
+      // Giả sử sellerId là 1 cho admin dashboard
+      const products = await getProducts(user.id);
       const categories = new Set(products.map((p) => p.category));
       const totalPrice = products.reduce((sum, p) => sum + p.price, 0);
 
@@ -99,7 +100,7 @@ const Dashboard = () => {
         </Link>
 
         <Link
-          to="/admin/products/add"
+          to="/admin/products/new"
           className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
         >
           <div className="flex items-center">

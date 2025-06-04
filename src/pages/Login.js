@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { login } from "../services/authApi";
@@ -9,8 +9,20 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
   const { login: authLogin } = useAuth();
+
+  useEffect(() => {
+    if (userData) {
+      authLogin(userData);
+      if (userData.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+    }
+  }, [userData, authLogin, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,13 +30,8 @@ function Login() {
     setIsLoading(true);
 
     try {
-      const userData = await login(email, password);
-      authLogin(userData);
-      if (userData.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
+      const data = await login(email, password);
+      setUserData(data);
     } catch (err) {
       setError(err.message || "Có lỗi xảy ra. Vui lòng thử lại sau.");
     } finally {
@@ -188,7 +195,7 @@ function Login() {
             <h3 className="text-sm font-medium text-gray-700 mb-2">
               Tài khoản demo:
             </h3>
-            <div className="space-y-1 text-sm text-gray-600">
+            <div className="space-y-1 text-sm text-gray-600 text-center">
               <p>User: demo@example.com / password</p>
               <p>Admin: admin@gmail.com / password</p>
             </div>

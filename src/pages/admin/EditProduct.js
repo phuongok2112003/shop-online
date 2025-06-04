@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import productService from "../../services/productService";
+import { getProduct, updateProduct } from "../../services/productApi";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -11,6 +11,7 @@ const EditProduct = () => {
     description: "",
     image: "",
     category: "",
+    sellerId: 1, // Thêm sellerId cho admin
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,13 +22,14 @@ const EditProduct = () => {
 
   const fetchProduct = async () => {
     try {
-      const data = await productService.getById(id);
+      const data = await getProduct(id);
       setFormData({
         name: data.name,
         price: data.price,
         description: data.description || "",
         image: data.image || "",
         category: data.category || "",
+        sellerId: data.sellerId,
       });
       setLoading(false);
     } catch (err) {
@@ -47,7 +49,7 @@ const EditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await productService.update(id, {
+      await updateProduct(id, {
         ...formData,
         price: Number(formData.price),
       });

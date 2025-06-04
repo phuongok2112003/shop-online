@@ -10,6 +10,7 @@ export const login = async (email, password) => {
         id: 1,
         email: email,
         name: "Demo User",
+        role:"user",
       };
     
     }  

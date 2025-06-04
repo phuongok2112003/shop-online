@@ -1,40 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import { OrderProvider } from "./context/OrderContext";
-import routes from "./routes";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { CategoryProvider } from "./context/CategoryContext";
+import { ThemeProvider } from "./context/ThemeContext";
+import UserRoutes from "./routes/userRoutes";
+import AdminRoutes from "./routes/adminRoutes";
 
 function App() {
+  useEffect(() => {
+    // Thêm class dark vào thẻ html
+    document.documentElement.classList.add("dark");
+  }, []);
+
   return (
-    <AuthProvider>
-      <CartProvider>
-        <OrderProvider>
-          <Router>
-            <div className="min-h-screen bg-gray-100 flex flex-col">
-              <main className="flex-grow">
-                <Routes>
-                  {routes.map((route) => (
-                    <Route
-                      key={route.path}
-                      path={route.path}
-                      element={
-                        route.protected ? (
-                          <ProtectedRoute>{route.element}</ProtectedRoute>
-                        ) : (
-                          route.element
-                        )
-                      }
-                    />
-                  ))}
-                </Routes>
-              </main>
-            </div>
-          </Router>
-        </OrderProvider>
-      </CartProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <CartProvider>
+          <OrderProvider>
+            <CategoryProvider>
+              <Router>
+                <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col">
+                  <main className="flex-grow">
+                    <Routes>
+                      <Route path="/admin/*" element={<AdminRoutes />} />
+                      <Route path="/*" element={<UserRoutes />} />
+                    </Routes>
+                  </main>
+                </div>
+              </Router>
+            </CategoryProvider>
+          </OrderProvider>
+        </CartProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

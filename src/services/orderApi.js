@@ -1,42 +1,47 @@
+import { mockOrders } from "../data/mockOrders";
 // Trong thực tế, API_URL sẽ là URL của backend
 const API_URL = "https://api.example.com";
 
-export const getOrders = async (userId) => {
+// Giả lập độ trễ của API
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const getOrders = async (sellerId) => {
   try {
-    // Trong thực tế, bạn sẽ gọi API backend để lấy danh sách đơn hàng
-    // Dựa vào user.id hoặc token xác thực
-    console.log("Fetching orders for user:", userId);
-
-    // Mock data đơn hàng
-    const mockOrders = [
-      {
-        id: 1,
-        date: "2023-10-27",
-        total: 750000,
-        status: "Đã giao hàng",
-        items: [
-          { id: 1, title: "Sản phẩm A", quantity: 1, price: 500000 },
-          { id: 2, title: "Sản phẩm B", quantity: 1, price: 250000 },
-        ],
-      },
-      {
-        id: 2,
-        date: "2023-10-25",
-        total: 1200000,
-        status: "Đang xử lý",
-        items: [{ id: 3, title: "Sản phẩm C", quantity: 2, price: 600000 }],
-      },
-    ];
-
-    // Giả lập thời gian fetch data
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(mockOrders);
-      }, 1000);
-    });
+    await delay(500);
+    return mockOrders.filter((order) => order.sellerId === sellerId);
   } catch (error) {
-    console.error("Error fetching orders:", error);
-    throw error;
+    throw new Error("Không thể lấy danh sách đơn hàng");
+  }
+};
+
+export const getOrder = async (id) => {
+  try {
+    await delay(300);
+    const order = mockOrders.find((o) => o.id === parseInt(id));
+    if (!order) {
+      throw new Error("Không tìm thấy đơn hàng");
+    }
+    return order;
+  } catch (error) {
+    throw new Error(error.message || "Không thể lấy thông tin đơn hàng");
+  }
+};
+
+export const updateOrderStatus = async (id, status) => {
+  try {
+    await delay(500);
+    const index = mockOrders.findIndex((o) => o.id === parseInt(id));
+    if (index === -1) {
+      throw new Error("Không tìm thấy đơn hàng");
+    }
+    mockOrders[index] = {
+      ...mockOrders[index],
+      status,
+      updatedAt: new Date().toISOString(),
+    };
+    return mockOrders[index];
+  } catch (error) {
+    throw new Error(error.message || "Không thể cập nhật trạng thái đơn hàng");
   }
 };
 
